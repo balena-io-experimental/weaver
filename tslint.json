@@ -1,0 +1,7 @@
+{
+  "extends": "./node_modules/@balena/lint/config/tslint-prettier.json",
+  "rules": {
+    "no-shadowed-variable": false,
+    "no-empty-interface": false
+  }
+}

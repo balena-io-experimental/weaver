@@ -1,4 +1,4 @@
-# Weaver
+# weaver
 
 Automatically generate an intricate web interconnecting all components of your project
 
