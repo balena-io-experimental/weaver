@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@balena/lint": "^6.2.0",
     "@nivo/core": "^0.79.0",
     "@nivo/network": "^0.79.1",
     "@types/node": "^16.11.32",
@@ -19,7 +20,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint:fix": "balena-lint --fix src"
   },
   "eslintConfig": {
     "extends": [
