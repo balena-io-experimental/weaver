@@ -2,8 +2,12 @@ import { existsSync, promises } from "fs";
 import path from "path";
 import { execSync } from "child_process";
 import express, { json, urlencoded } from "express";
+import { Dataset } from './src/types';
 
 const REPO_PATH = "./repository";
+let context = {
+  repoUrl: '',
+}
 
 const app = express();
 const port = 8000;
@@ -11,7 +15,7 @@ const port = 8000;
 app.use(json());
 app.use(urlencoded());
 app.use(function (req: any, res: any, next: any) {
-  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.header("Access-Control-Allow-Origin", "*");
   res.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept"
@@ -37,15 +41,16 @@ app.get("/getRepoInfo", (req: any, res: any) => {
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`App listening on port ${port}`);
 });
 
 // METHODS:
 const cloneRepo = async (res: any, repoUrl: string) => {
   if (!repoUrl) {
-    res.json({ error: { message: "Bad request: missing repo URL" } });
+    res.status(400).json({ error: { message: "Bad request: missing repo URL" } });
     return;
   }
+  context.repoUrl = repoUrl;
   if (!existsSync(REPO_PATH)) {
     try {
       await promises.mkdir(REPO_PATH);
@@ -55,28 +60,19 @@ const cloneRepo = async (res: any, repoUrl: string) => {
   }
   try {
     execSync(`cd ${REPO_PATH} && git clone ${repoUrl} && cd ..`);
-    res.json({ data: "Repository Cloned" });
+    res.status(200).json({ data: "Repository Cloned" });
     return;
   } catch (err) {
+    logError(err);
     res.status(500).json(err);
   }
 };
 
-export interface NodeProps {
-  id: string;
-  size: number;
-}
-
-export interface LinkProps {
-  source: string;
-  target: string;
-  distance: number;
-}
-
 const getRepoInfo = async (res: any) => {
   const repoName = (await getDirectories(REPO_PATH))?.[0];
-  let nodes: Array<NodeProps> = [];
-  let links: Array<LinkProps> = [];
+  let nodes: Dataset['nodes'] = [];
+  let edges: Dataset['edges'] = [];
+  let clusters: any[] = [];
   const files = await getFilesInDirectory(REPO_PATH);
 
   if (!files) {
@@ -84,8 +80,18 @@ const getRepoInfo = async (res: any) => {
   }
   for (const filePath of files) {
     const repoFilePath = filePath.replace(`repository/${repoName}/`, "");
+    const clusterId = `${clusters.length}`;
+    clusters.push({ clusterLabel: repoFilePath, color: "#" + Math.floor(Math.random() * 16777215).toString(16), key: clusterId });
     try {
-      nodes.push({ id: `/${repoFilePath}`, size: 1 });
+      nodes.push({
+        key: `${repoFilePath}`,
+        label: `/${repoFilePath}`,
+        cluster: clusterId,
+        URL: `${context.repoUrl.replace(".git", "")}/blob/master/${repoFilePath}`,
+        x: Math.random(),
+        y: Math.random(),
+        size: 5
+      });
       if (
         !repoFilePath.endsWith("tsx") &&
         !repoFilePath.endsWith("ts") &&
@@ -110,18 +116,24 @@ const getRepoInfo = async (res: any) => {
         }
         for (const comp of imp.components) {
           const idx = nodes.findIndex(
-            (node) => node.id === `${comp.name}|${relativePath}`
+            (node) => node.key === `${relativePath}`
           );
           if (idx >= 0) {
-            nodes[idx].size = nodes[idx].size + 1;
+            nodes[idx].size = nodes[idx].size + 5;
           } else {
-            nodes.push({ id: `${comp.name}|${relativePath}`, size: 1 });
+            nodes.push({
+              key: `${relativePath}`,
+              label: `import ${comp.name} from ${relativePath}`,
+              cluster: clusterId,
+              URL: `${context.repoUrl.replace(".git", "")}/blob/master/${repoFilePath}`,
+              x: Math.random(),
+              y: Math.random(),
+              size: 5
+            });
           }
-          links.push({
-            source: `/${repoFilePath}`,
-            target: `${comp.name}|${relativePath}`,
-            distance: 25,
-          });
+          if(!edges.some(([a,b]) => a === relativePath && b === repoFilePath)) {
+            edges.push([`${relativePath}`, `${repoFilePath}`]);
+          }
         }
       }
     } catch (err) {
@@ -129,7 +141,7 @@ const getRepoInfo = async (res: any) => {
     }
   }
   // TODO: for now we just close the request
-  res.status(200).json({ nodes, links });
+  res.status(200).json({ nodes, edges, clusters });
 };
 
 const getFilesInDirectory = async (dir: string) => {
@@ -179,34 +191,30 @@ const logError = (...args: any) => {
  */
 const getImports = (fileContent: string) => {
   return fileContent
-    .replaceAll(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, "")
-    .replaceAll("\\`", "")
-    .replaceAll(/`([\s\S]*?)`/gm, "")
+    .replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, "")
+    .replace(/\\`/gm, "")
+    .replace(/`([\s\S]*?)`/gm, "")
     .split("import")
     .filter((x) => x.includes("from "))
     .map((a) => {
-      const [components, path] = a.split("from");
+      const [components, path] = a.split(/\bfrom\b/gm);
       return {
         components: components
-          .replaceAll(/\r?\n/g, "")
-          .replaceAll("{", "")
-          .replaceAll("}", "")
-          .replaceAll("\t", "")
+          .replace(/\r?\n/gm, "")
+          .replace(/[{}]/gm, "")
+          .replace(/\t/gm, "")
           .split(",")
           .filter((a) => !!a.trim())
           .map((t) => {
             const aliased = t.split(" as ");
             return {
-              name: aliased[0].replaceAll(" ", ""),
-              alias: !!aliased[1] ? aliased[1].replaceAll(" ", "") : null,
+              name: aliased[0].replace(/ /gm, ""),
+              alias: !!aliased[1] ? aliased[1].replace(/ /gm, "") : null,
             };
           }),
         path: path
-          .replaceAll(";", "")
-          .replaceAll(" ", "")
-          .replaceAll('\\"', "")
-          .replaceAll("'", "")
-          .replaceAll('"', "")
+          .replace(/[; '"]/gm, "")
+          .replace(/\\"/gm, "")
           .split(/\r?\n/)[0],
       };
     });
