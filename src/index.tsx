@@ -1,10 +1,29 @@
-import React from 'react';
-import * as ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import * as ReactDOM from "react-dom";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
+import { createGlobalStyle } from 'styled-components';
+import { Provider } from "rendition";
 
-ReactDOM.render(<App />, document.getElementById('root') as HTMLElement);
+const GlobalStyle = createGlobalStyle`
+	* {
+		box-sizing: border-box;
+	}
+
+	html,
+	body {
+		height: 100%;
+		margin: 0;
+		padding: 0;
+	}
+`;
+
+ReactDOM.render(
+	<Provider style={{width: '100vw', height: '100vh'}}>
+		<App />
+		<GlobalStyle />
+	</Provider>,
+  document.getElementById("root") as HTMLElement
+);
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
