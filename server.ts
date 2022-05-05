@@ -37,7 +37,11 @@ app.post("/clone", async (req: any, res: any) => {
 });
 
 app.get("/getRepoInfo", (req: any, res: any) => {
-  getRepoInfo(res);
+  if(!req.query?.groupBy) {
+    logError('Missing groupBy param');
+    res.status(400).json({ error: { message: "Bad request: missing groupBy param" } });
+  }
+  getRepoInfo(res, req.query.groupBy);
 });
 
 app.listen(port, () => {
@@ -68,7 +72,7 @@ const cloneRepo = async (res: any, repoUrl: string) => {
   }
 };
 
-const getRepoInfo = async (res: any) => {
+const getRepoInfo = async (res: any, groupBy: string) => {
   const repoName = (await getDirectories(REPO_PATH))?.[0];
   let nodes: Dataset['nodes'] = [];
   let edges: Dataset['edges'] = [];
@@ -115,14 +119,15 @@ const getRepoInfo = async (res: any) => {
           );
         }
         for (const comp of imp.components) {
+          const key = groupBy === 'export' ? `${comp.name}|${relativePath}` : `${relativePath}`;
           const idx = nodes.findIndex(
-            (node) => node.key === `${relativePath}`
+            (node) => node.key === key
           );
           if (idx >= 0) {
-            nodes[idx].size = nodes[idx].size + 5;
+            nodes[idx].size = nodes[idx].size + 1;
           } else {
             nodes.push({
-              key: `${relativePath}`,
+              key,
               label: `import ${comp.name} from ${relativePath}`,
               cluster: clusterId,
               URL: `${context.repoUrl.replace(".git", "")}/blob/master/${repoFilePath}`,
@@ -132,7 +137,7 @@ const getRepoInfo = async (res: any) => {
             });
           }
           if(!edges.some(([a,b]) => a === relativePath && b === repoFilePath)) {
-            edges.push([`${relativePath}`, `${repoFilePath}`]);
+            edges.push([key, repoFilePath]);
           }
         }
       }

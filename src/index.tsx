@@ -1,7 +1,7 @@
-import * as ReactDOM from "react-dom";
-import { App } from "./App";
-import reportWebVitals from "./reportWebVitals";
-import { createGlobalStyle } from "styled-components";
+import * as ReactDOM from 'react-dom';
+import { App } from './App';
+import reportWebVitals from './reportWebVitals';
+import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
 	:root {
@@ -80,7 +80,7 @@ ReactDOM.render(
 		<App />
 		<GlobalStyle />
 	</>,
-	document.getElementById("root") as HTMLElement
+	document.getElementById('root') as HTMLElement,
 );
 
 // If you want to start measuring performance in your app, pass a function
