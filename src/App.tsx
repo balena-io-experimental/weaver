@@ -18,6 +18,7 @@ const Card = styled.div`
 	width: 600px;
 	padding: 40px 20px;
 	box-shadow: 2px 6px 10px rgb(136 136 136 / 30%);
+	margin: 10px 0px;
 `;
 
 const Input = styled.input`
@@ -38,6 +39,7 @@ export const App = () => {
 	if (!showGraph) {
 		return (
 			<UserInteractionWrapper>
+				<h1>weaver</h1>
 				<Card>
 					<h3>Insert GitHub information:</h3>
 					<label>Owner:</label>
@@ -60,6 +62,7 @@ export const App = () => {
 						</Button>
 					</div>
 				</Card>
+				<img src="logo.svg" style={{ height: '200px', width: '200px' }} />
 			</UserInteractionWrapper>
 		);
 	}

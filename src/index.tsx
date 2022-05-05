@@ -27,9 +27,9 @@ const GlobalStyle = createGlobalStyle`
 		font-size: 0.9em;
 		overflow: hidden;
 	}
-	h1,
-	h2 {
-		font-family: Lora, serif;
+	h1 {
+		font-size: 4em;
+		margin: 0;
 	}
 	h2 {
 		font-size: 1.3em;
