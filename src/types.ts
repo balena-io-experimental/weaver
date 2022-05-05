@@ -22,4 +22,5 @@ export interface Dataset {
 
 export interface FiltersState {
 	filePaths: Record<string, boolean>;
+	onlyOrphans: boolean;
 }

@@ -28,19 +28,35 @@ export const GraphDataController: FC<GraphDataControllerProps> = ({
 			graph.addNode(node.key, {
 				...node,
 				...omit(filePaths[node.filePath], 'key'),
+				hasEdge: false,
 			}),
 		);
-		dataset.edges.forEach(([source, target]) =>
-			graph.addEdge(source, target, { size: 1 }),
-		);
+		dataset.edges.forEach(([source, target]) => {
+			graph.addEdge(source, target, { size: 1 });
+			if (!graph.getNodeAttribute(target, 'hasEdge')) {
+				graph.updateNode(target, (attributes) => ({
+					...attributes,
+					hasEdge: true,
+				}));
+			}
+			if (!graph.getNodeAttribute(source, 'hasEdge')) {
+				graph.updateNode(source, (attributes) => ({
+					...attributes,
+					hasEdge: true,
+				}));
+			}
+		});
 
 		return () => graph.clear();
 	}, [graph, dataset]);
-
 	useEffect(() => {
-		const { filePaths } = filters;
-		graph.forEachNode((node, { filePath }) => {
-			graph.setNodeAttribute(node, 'hidden', !filePaths[filePath]);
+		const { filePaths, onlyOrphans } = filters;
+		graph.forEachNode((node, { filePath, hasEdge }) => {
+			graph.setNodeAttribute(
+				node,
+				'hidden',
+				!filePaths[filePath] || (onlyOrphans && hasEdge),
+			);
 		});
 	}, [graph, filters]);
 

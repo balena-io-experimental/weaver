@@ -25,6 +25,7 @@ Automatically generate an intricate web interconnecting all components of your p
 - You can manage the file paths you do and do not want to see via the `File paths` menu on the right.
 - You can search for a specific node to zoom in on it via the search bar.
 - Hovering on a node will show you every node it is connected to.
+- Isolate nodes that do not have links by hiding those that do.
 - (Optional) Provide [github auth token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) in order to access private repos.
 - Choose whether to render the graph with nodes grouped by either module or export.
 

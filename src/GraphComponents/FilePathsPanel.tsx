@@ -78,7 +78,6 @@ const CustomButton = styled.div`
 	border-radius: var(--border-radius);
 	padding: 0.3em 0.5em;
 	font-size: 1em;
-	font-family: Lato, sans-serif;
 	cursor: pointer;
 	:hover {
 		opacity: var(--hover-opacity);
@@ -146,7 +145,8 @@ export const FilePathsPanel: FC<FilePathsPanelProps> = ({
 		<Panel
 			title={
 				<>
-					<FontAwesomeIcon icon={faObjectGroup} /> File Paths
+					<FontAwesomeIcon icon={faObjectGroup} />
+					<label style={{ marginLeft: 3 }}>File paths</label>
 					{visibleFilePathsCount < filePaths.length ? (
 						<Txt muted small>
 							{' '}
