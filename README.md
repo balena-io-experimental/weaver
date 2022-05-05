@@ -2,49 +2,20 @@
 
 Automatically generate an intricate web interconnecting all components of your project
 
-# Getting Started with Create React App
+## Usage
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+1. Clone this repo locally
+2. Run `npm i`
+3. Create a `.env` file in the base directory of the locally cloned repo
+   - Add an env variable called `REACT_APP_GITHUB_TOKEN` and set it to your [github auth token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) with read-access (write-access is neither used nor required)
+   - Add an env variable called `REACT_APP_SERVER_URL` and set it to `http://localhost:8000`
+   - (Optional) Add an env variable called `GENERATE_SOURCEMAP` and set it to false (Windows users will likely see the following warning in their console without this env variable: `Failed to parse source map from '/path/to/repo/node_modules/graphology/dist/graphology.umd.min.js.map' file: Error: ENOENT: no such file or directory, open '/path/to/repo/weaver/node_modules/graphology/dist/graphology.umd.min.js.map'`)
+4. In the `App.tsx` file, you will see the `getRepo` function being called and accepting 2 parameters. The first parameter is for the repository owner, the second parameter is for the repository name. Set the 2 parameters to the info of the repository you want to visualize
+5. Run `npm run server` in one terminal
+6. Run `npm start` in another terminal
+7. `localhost:3000` will open in a new tab in your browser. Once loaded, it will locally clone the repo if it can access it with the provided auth token. Then it will parse the files in the repo to detect all imports and create nodes and links. Once it is finished, you will see the graphic appear on the site.
+8. You can manage the file paths you do and do not want to see via the `File paths` menu on the right. You can search for a specific node to zoom in on it via the search bar. Hovering on a node will show you every node it is connected to.
 
-## Available Scripts
+## Contribution Guidelines
 
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+If you find any bugs, please create an issue with steps for reproduction. If you want to fix a bug or add a feature, please assign yourself to the issue your are addressing (create one if it does not exist yet) and create a PR with your changes and request review from the maintainers of this project. PRs will be reviewed as soon as possible.
