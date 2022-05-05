@@ -42,7 +42,7 @@ export function drawHover(
 	const subLabelSize = size - 2;
 
 	const label = data.label;
-	const clusterLabel = data.clusterLabel;
+	const filePathLabel = data.filePathLabel;
 
 	// Then we draw the label background
 	context.beginPath();
@@ -56,20 +56,20 @@ export function drawHover(
 	const labelWidth = context.measureText(label).width;
 	context.font = `${weight} ${subLabelSize}px ${font}`;
 	context.font = `${weight} ${subLabelSize}px ${font}`;
-	const clusterLabelWidth = clusterLabel
-		? context.measureText(clusterLabel).width
+	const filePathLabelWidth = filePathLabel
+		? context.measureText(filePathLabel).width
 		: 0;
 
-	const textWidth = Math.max(labelWidth, clusterLabelWidth);
+	const textWidth = Math.max(labelWidth, filePathLabelWidth);
 
 	const x = Math.round(data.x);
 	const y = Math.round(data.y);
 	const w = Math.round(textWidth + size / 2 + data.size + 3);
 	const hLabel = Math.round(size / 2 + 4);
 
-	const hClusterLabel = Math.round(subLabelSize / 2 + 9);
+	const hFilePathLabel = Math.round(subLabelSize / 2 + 9);
 
-	drawRoundRect(context, x, y - 12, w, hClusterLabel + hLabel + 12, 5);
+	drawRoundRect(context, x, y - 12, w, hFilePathLabel + hLabel + 12, 5);
 	context.closePath();
 	context.fill();
 
@@ -85,7 +85,7 @@ export function drawHover(
 	context.fillStyle = data.color;
 	context.font = `${weight} ${subLabelSize}px ${font}`;
 	context.fillText(
-		clusterLabel,
+		filePathLabel,
 		data.x + data.size + 3,
 		data.y + size / 3 + 3 + subLabelSize,
 	);
