@@ -83,7 +83,7 @@ export const App = () => {
 	if (!showGraph || !data || !repoName) {
 		return (
 			<Loader
-				content="Loading, this could take several seconds..."
+				content="Loading, this could take several seconds"
 				show={showGraph && !data}
 			>
 				<UserInteractionWrapper>

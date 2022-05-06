@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 const LoaderWrapper = styled.div`
 	position: absolute;
@@ -14,6 +14,25 @@ const LoaderWrapper = styled.div`
 	color: white;
 `;
 
+const ellipsis = keyframes`
+	to {
+		width: 1.25em;    
+	}
+`;
+
+const Loading = styled.div`
+	font-size: 14px;
+	&:after {
+		overflow: hidden;
+		display: inline-block;
+		vertical-align: bottom;
+		-webkit-animation: ${ellipsis} steps(4, end) 1500ms infinite;
+		animation: ${ellipsis} steps(4, end) 1500ms infinite;
+		content: '...';
+		width: 0px;
+	}
+`;
+
 export interface LoaderProps {
 	show: boolean;
 	content: string;
@@ -26,7 +45,9 @@ export const Loader: FC<LoaderProps> = ({ show, content, children }) => {
 
 	return (
 		<>
-			<LoaderWrapper>{content}</LoaderWrapper>
+			<LoaderWrapper>
+				{content} <Loading />
+			</LoaderWrapper>
 			{children}
 		</>
 	);
