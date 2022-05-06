@@ -23,3 +23,11 @@ export const getRepoInfo = (groupBy: string) => {
 	const url = `${process.env.REACT_APP_SERVER_URL}/getRepoInfo`;
 	return axios.get(url, { params: { groupBy } });
 };
+
+export const getRepoReadme = () => {
+	if (!process.env.REACT_APP_SERVER_URL) {
+		return Promise.reject('Missing REACT_APP_SERVER_URL env var');
+	}
+	const url = `${process.env.REACT_APP_SERVER_URL}/getRepoReadme`;
+	return axios.get(url);
+};

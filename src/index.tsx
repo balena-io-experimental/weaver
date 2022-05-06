@@ -15,7 +15,7 @@ const GlobalStyle = createGlobalStyle`
 		--shadow: 0 1px 5px var(--dark-grey);
 		--hover-opacity: 0.7;
 		--stage-padding: 8px;
-		--panels-width: 350px;
+		--panels-width: 500px;
 		--border-radius: 3px;
 	}
 	* {

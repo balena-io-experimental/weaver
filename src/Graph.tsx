@@ -13,7 +13,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { GraphTitle } from './GraphComponents/GraphTitle';
 import { SearchField } from './GraphComponents/SearchField';
-// import { DescriptionPanel } from "./GraphComponents/DescriptionPanel";
+import { DescriptionPanel } from "./GraphComponents/DescriptionPanel";
 import { FilePathsPanel } from './GraphComponents/FilePathsPanel';
 import omit from 'lodash/omit';
 import drawLabel from './utils/canvas-utils';
@@ -67,7 +67,7 @@ const Panels = styled.div`
 	position: absolute;
 	bottom: 0;
 	right: 0;
-	width: 350px;
+	width: var(--panels-width);
 	max-height: calc(100vh - 42 * var(--stage-padding));
 	overflow-y: auto;
 	padding: var(--stage-padding);
@@ -187,7 +187,7 @@ export const Graph: FC<GraphProps> = ({
 										setFiltersState({ ...filtersState, onlyOrphans: value });
 									}}
 								/>
-								{/* <DescriptionPanel /> */}
+								<DescriptionPanel />
 								<FilePathsPanel
 									filePaths={data.filePaths}
 									filters={filtersState}

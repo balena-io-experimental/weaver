@@ -74,7 +74,7 @@ export const Panel: FC<PanelProps> = ({
 					)}
 				</button>
 			</h2>
-			<AnimateHeight duration={DURATION} height={isDeployed ? 'auto' : 0}>
+			<AnimateHeight duration={DURATION} height={isDeployed ? 'auto' : 0} style={{ wordWrap: "break-word" }}>
 				{children}
 			</AnimateHeight>
 		</PanelWrapper>
