@@ -101,25 +101,25 @@ export const App = () => {
 						<label>Owner:</label>
 						<Input
 							autoComplete="true"
-							value={owner}
+							value={owner ?? ''}
 							onChange={(e) => setOwner(e.target.value)}
 						/>
 						<label>Repository name:</label>
 						<Input
 							autoComplete="true"
-							value={repoName}
+							value={repoName ?? ''}
 							onChange={(e) => setRepoName(e.target.value)}
 						/>
 						<label>Token:</label>
 						<Input
 							autoComplete="true"
-							value={token}
+							value={token ?? ''}
 							type="password"
 							onChange={(e) => setToken(e.target.value)}
 						/>
 						<label>Group by:</label>
 						<Select
-							value={groupBy}
+							value={groupBy ?? ''}
 							onChange={(e) => setGroupBy(e.target.value)}
 						>
 							<option value="export">Export</option>
