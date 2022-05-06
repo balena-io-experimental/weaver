@@ -2,24 +2,24 @@ export interface NodeData {
 	key: string;
 	label: string;
 	URL: string;
-	cluster: string;
+	filePath: string;
 	x: number;
 	y: number;
 	size: number;
 }
 
-export interface Cluster {
+export interface FilePath {
 	key: string;
 	color: string;
-	clusterLabel: string;
+	filePathLabel: string;
 }
 
 export interface Dataset {
 	nodes: NodeData[];
 	edges: Array<[string, string]>;
-	clusters: Cluster[];
+	filePaths: FilePath[];
 }
 
 export interface FiltersState {
-	clusters: Record<string, boolean>;
+	filePaths: Record<string, boolean>;
 }

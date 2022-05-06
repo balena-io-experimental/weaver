@@ -14,7 +14,7 @@ import {
 import { GraphTitle } from './GraphComponents/GraphTitle';
 import { SearchField } from './GraphComponents/SearchField';
 // import { DescriptionPanel } from "./GraphComponents/DescriptionPanel";
-import { ClustersPanel } from './GraphComponents/ClustersPanel';
+import { FilePathsPanel } from './GraphComponents/FilePathsPanel';
 import omit from 'lodash/omit';
 import drawLabel from './utils/canvas-utils';
 import getNodeProgramImage from 'sigma/rendering/webgl/programs/node.image';
@@ -98,7 +98,7 @@ export const Graph: FC<GraphProps> = ({
 	const [data, setData] = useState<Dataset | undefined>();
 	const [repositoryName, setRepositoryName] = useState<string>();
 	const [filtersState, setFiltersState] = useState<FiltersState>({
-		clusters: {},
+		filePaths: {},
 	});
 
 	useEffect(() => {
@@ -111,8 +111,8 @@ export const Graph: FC<GraphProps> = ({
 				getRepoInfo(groupBy).then((res) => {
 					setData(res.data);
 					setFiltersState({
-						clusters: mapValues(
-							keyBy(res.data.clusters, 'key'),
+						filePaths: mapValues(
+							keyBy(res.data.filePaths, 'key'),
 							constant(true),
 						),
 					});
@@ -179,21 +179,21 @@ export const Graph: FC<GraphProps> = ({
 							<Panels>
 								<SearchField filters={filtersState} />
 								{/* <DescriptionPanel /> */}
-								<ClustersPanel
-									clusters={data.clusters}
+								<FilePathsPanel
+									filePaths={data.filePaths}
 									filters={filtersState}
-									setClusters={(clusters) =>
+									setFilePaths={(filePaths) =>
 										setFiltersState((filters) => ({
 											...filters,
-											clusters,
+											filePaths,
 										}))
 									}
-									toggleCluster={(cluster) => {
+									toggleFilePath={(filePath) => {
 										setFiltersState((filters) => ({
 											...filters,
-											clusters: filters.clusters[cluster]
-												? omit(filters.clusters, cluster)
-												: { ...filters.clusters, [cluster]: true },
+											filePaths: filters.filePaths[filePath]
+												? omit(filters.filePaths, filePath)
+												: { ...filters.filePaths, [filePath]: true },
 										}));
 									}}
 								/>

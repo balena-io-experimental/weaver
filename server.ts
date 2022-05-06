@@ -2,12 +2,12 @@ import { existsSync, promises } from "fs";
 import path from "path";
 import { execSync } from "child_process";
 import express, { json, urlencoded } from "express";
-import { Dataset } from './src/types';
+import { Dataset } from "./src/types";
 
 const REPO_PATH = "./repository";
 let context = {
-  repoUrl: '',
-}
+  repoUrl: "",
+};
 
 const app = express();
 const port = 8000;
@@ -37,9 +37,11 @@ app.post("/clone", async (req: any, res: any) => {
 });
 
 app.get("/getRepoInfo", (req: any, res: any) => {
-  if(!req.query?.groupBy) {
-    logError('Missing groupBy param');
-    res.status(400).json({ error: { message: "Bad request: missing groupBy param" } });
+  if (!req.query?.groupBy) {
+    logError("Missing groupBy param");
+    res
+      .status(400)
+      .json({ error: { message: "Bad request: missing groupBy param" } });
   }
   getRepoInfo(res, req.query.groupBy);
 });
@@ -51,7 +53,9 @@ app.listen(port, () => {
 // METHODS:
 const cloneRepo = async (res: any, repoUrl: string) => {
   if (!repoUrl) {
-    res.status(400).json({ error: { message: "Bad request: missing repo URL" } });
+    res
+      .status(400)
+      .json({ error: { message: "Bad request: missing repo URL" } });
     return;
   }
   context.repoUrl = repoUrl;
@@ -74,9 +78,9 @@ const cloneRepo = async (res: any, repoUrl: string) => {
 
 const getRepoInfo = async (res: any, groupBy: string) => {
   const repoName = (await getDirectories(REPO_PATH))?.[0];
-  let nodes: Dataset['nodes'] = [];
-  let edges: Dataset['edges'] = [];
-  let clusters: any[] = [];
+  let nodes: Dataset["nodes"] = [];
+  let edges: Dataset["edges"] = [];
+  let filePaths: any[] = [];
   const files = await getFilesInDirectory(REPO_PATH);
 
   if (!files) {
@@ -84,17 +88,24 @@ const getRepoInfo = async (res: any, groupBy: string) => {
   }
   for (const filePath of files) {
     const repoFilePath = filePath.replace(`repository/${repoName}/`, "");
-    const clusterId = `${clusters.length}`;
-    clusters.push({ clusterLabel: repoFilePath, color: "#" + Math.floor(Math.random() * 16777215).toString(16), key: clusterId });
+    const filePathId = `${filePaths.length}`;
+    filePaths.push({
+      filePathLabel: repoFilePath,
+      color: "#" + Math.floor(Math.random() * 16777215).toString(16),
+      key: filePathId,
+    });
     try {
       nodes.push({
         key: `${repoFilePath}`,
         label: `/${repoFilePath}`,
-        cluster: clusterId,
-        URL: `${context.repoUrl.replace(".git", "")}/blob/master/${repoFilePath}`,
+        filePath: filePathId,
+        URL: `${context.repoUrl.replace(
+          ".git",
+          ""
+        )}/blob/master/${repoFilePath}`,
         x: Math.random(),
         y: Math.random(),
-        size: 5
+        size: 5,
       });
       if (
         !repoFilePath.endsWith("tsx") &&
@@ -119,24 +130,30 @@ const getRepoInfo = async (res: any, groupBy: string) => {
           );
         }
         for (const comp of imp.components) {
-          const key = groupBy === 'export' ? `${comp.name}|${relativePath}` : `${relativePath}`;
-          const idx = nodes.findIndex(
-            (node) => node.key === key
-          );
+          const key =
+            groupBy === "export"
+              ? `${comp.name}|${relativePath}`
+              : `${relativePath}`;
+          const idx = nodes.findIndex((node) => node.key === key);
           if (idx >= 0) {
             nodes[idx].size = nodes[idx].size + 1;
           } else {
             nodes.push({
               key,
               label: `import ${comp.name} from ${relativePath}`,
-              cluster: clusterId,
-              URL: `${context.repoUrl.replace(".git", "")}/blob/master/${repoFilePath}`,
+              filePath: filePathId,
+              URL: `${context.repoUrl.replace(
+                ".git",
+                ""
+              )}/blob/master/${repoFilePath}`,
               x: Math.random(),
               y: Math.random(),
-              size: 5
+              size: 5,
             });
           }
-          if(!edges.some(([a,b]) => a === relativePath && b === repoFilePath)) {
+          if (
+            !edges.some(([a, b]) => a === relativePath && b === repoFilePath)
+          ) {
             edges.push([key, repoFilePath]);
           }
         }
@@ -146,7 +163,7 @@ const getRepoInfo = async (res: any, groupBy: string) => {
     }
   }
   // TODO: for now we just close the request
-  res.status(200).json({ nodes, edges, clusters });
+  res.status(200).json({ nodes, edges, filePaths });
 };
 
 const getFilesInDirectory = async (dir: string) => {

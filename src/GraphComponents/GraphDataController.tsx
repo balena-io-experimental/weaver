@@ -22,12 +22,12 @@ export const GraphDataController: FC<GraphDataControllerProps> = ({
 			return;
 		}
 
-		const clusters = keyBy(dataset.clusters, 'key');
+		const filePaths = keyBy(dataset.filePaths, 'key');
 
 		dataset.nodes.forEach((node) =>
 			graph.addNode(node.key, {
 				...node,
-				...omit(clusters[node.cluster], 'key'),
+				...omit(filePaths[node.filePath], 'key'),
 			}),
 		);
 		dataset.edges.forEach(([source, target]) =>
@@ -38,9 +38,9 @@ export const GraphDataController: FC<GraphDataControllerProps> = ({
 	}, [graph, dataset]);
 
 	useEffect(() => {
-		const { clusters } = filters;
-		graph.forEachNode((node, { cluster }) => {
-			graph.setNodeAttribute(node, 'hidden', !clusters[cluster]);
+		const { filePaths } = filters;
+		graph.forEachNode((node, { filePath }) => {
+			graph.setNodeAttribute(node, 'hidden', !filePaths[filePath]);
 		});
 	}, [graph, filters]);
 

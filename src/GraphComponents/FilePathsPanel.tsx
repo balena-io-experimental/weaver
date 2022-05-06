@@ -1,7 +1,7 @@
 import { FC, useEffect, useMemo, useState } from 'react';
 import { useSigma } from 'react-sigma-v2';
 import { sortBy, values, keyBy, mapValues } from 'lodash';
-import { Cluster, FiltersState } from '../types';
+import { FilePath, FiltersState } from '../types';
 import { Panel } from './Panel';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -88,41 +88,41 @@ const CustomButton = styled.div`
 	}
 `;
 
-export interface ClustersPanelProps {
-	clusters: Cluster[];
+export interface FilePathsPanelProps {
+	filePaths: FilePath[];
 	filters: FiltersState;
-	toggleCluster: (cluster: string) => void;
-	setClusters: (clusters: Record<string, boolean>) => void;
+	toggleFilePath: (filePath: string) => void;
+	setFilePaths: (filePaths: Record<string, boolean>) => void;
 }
 
-export const ClustersPanel: FC<ClustersPanelProps> = ({
-	clusters,
+export const FilePathsPanel: FC<FilePathsPanelProps> = ({
+	filePaths,
 	filters,
-	toggleCluster,
-	setClusters,
+	toggleFilePath,
+	setFilePaths,
 }) => {
 	const sigma = useSigma();
 	const graph = sigma.getGraph();
 
-	const nodesPerCluster = useMemo(() => {
+	const nodesPerFilePath = useMemo(() => {
 		const index: Record<string, number> = {};
 		graph.forEachNode(
-			(_, { cluster }) => (index[cluster] = (index[cluster] || 0) + 1),
+			(_, { filePath }) => (index[filePath] = (index[filePath] || 0) + 1),
 		);
 		return index;
 	}, []);
 
-	const maxNodesPerCluster = useMemo(
-		() => Math.max(...values(nodesPerCluster)),
-		[nodesPerCluster],
+	const maxNodesPerFilePath = useMemo(
+		() => Math.max(...values(nodesPerFilePath)),
+		[nodesPerFilePath],
 	);
-	const visibleClustersCount = useMemo(
-		() => Object.keys(filters.clusters).length,
+	const visibleFilePathsCount = useMemo(
+		() => Object.keys(filters.filePaths).length,
 		[filters],
 	);
 
-	const [visibleNodesPerCluster, setVisibleNodesPerCluster] =
-		useState<Record<string, number>>(nodesPerCluster);
+	const [visibleNodesPerFilePath, setVisibleNodesPerFilePath] =
+		useState<Record<string, number>>(nodesPerFilePath);
 	useEffect(() => {
 		// To ensure the graphology instance has up to data "hidden" values for
 		// nodes, we wait for next frame before reindexing. This won't matter in the
@@ -130,16 +130,16 @@ export const ClustersPanel: FC<ClustersPanelProps> = ({
 		requestAnimationFrame(() => {
 			const index: Record<string, number> = {};
 			graph.forEachNode(
-				(_, { cluster, hidden }) =>
-					!hidden && (index[cluster] = (index[cluster] || 0) + 1),
+				(_, { filePath, hidden }) =>
+					!hidden && (index[filePath] = (index[filePath] || 0) + 1),
 			);
-			setVisibleNodesPerCluster(index);
+			setVisibleNodesPerFilePath(index);
 		});
 	}, [filters]);
 
-	const sortedClusters = useMemo(
-		() => sortBy(clusters, (cluster) => -nodesPerCluster[cluster.key]),
-		[clusters, nodesPerCluster],
+	const sortedFilePaths = useMemo(
+		() => sortBy(filePaths, (filePath) => -nodesPerFilePath[filePath.key]),
+		[filePaths, nodesPerFilePath],
 	);
 
 	return (
@@ -147,10 +147,10 @@ export const ClustersPanel: FC<ClustersPanelProps> = ({
 			title={
 				<>
 					<FontAwesomeIcon icon={faObjectGroup} /> File Paths
-					{visibleClustersCount < clusters.length ? (
+					{visibleFilePathsCount < filePaths.length ? (
 						<Txt muted small>
 							{' '}
-							({visibleClustersCount} / {clusters.length})
+							({visibleFilePathsCount} / {filePaths.length})
 						</Txt>
 					) : (
 						''
@@ -166,22 +166,22 @@ export const ClustersPanel: FC<ClustersPanelProps> = ({
 			<ButtonsWrapper>
 				<CustomButton
 					onClick={() =>
-						setClusters(mapValues(keyBy(clusters, 'key'), () => true))
+						setFilePaths(mapValues(keyBy(filePaths, 'key'), () => true))
 					}
 				>
 					<FontAwesomeIcon icon={faSquareCheck} /> Check all
 				</CustomButton>{' '}
-				<CustomButton onClick={() => setClusters({})}>
+				<CustomButton onClick={() => setFilePaths({})}>
 					<FontAwesomeIcon icon={faRectangleXmark} /> Uncheck all
 				</CustomButton>
 			</ButtonsWrapper>
 			<CaptionList>
-				{sortedClusters.map((cluster) => {
-					const nodesCount = nodesPerCluster[cluster.key];
-					const visibleNodesCount = visibleNodesPerCluster[cluster.key] || 0;
+				{sortedFilePaths.map((filePath) => {
+					const nodesCount = nodesPerFilePath[filePath.key];
+					const visibleNodesCount = visibleNodesPerFilePath[filePath.key] || 0;
 					return (
 						<CaptionRow
-							key={cluster.key}
+							key={filePath.key}
 							title={`${nodesCount} page${nodesCount > 1 ? 's' : ''}${
 								visibleNodesCount !== nodesCount
 									? ` (only ${visibleNodesCount} visible)`
@@ -190,25 +190,25 @@ export const ClustersPanel: FC<ClustersPanelProps> = ({
 						>
 							<input
 								type="checkbox"
-								checked={filters.clusters[cluster.key] || false}
-								onChange={() => toggleCluster(cluster.key)}
-								id={`cluster-${cluster.key}`}
+								checked={filters.filePaths[filePath.key] || false}
+								onChange={() => toggleFilePath(filePath.key)}
+								id={`filePath-${filePath.key}`}
 							/>
-							<label htmlFor={`cluster-${cluster.key}`}>
+							<label htmlFor={`filePath-${filePath.key}`}>
 								<span
 									data-type="circle"
 									style={{
-										background: cluster.color,
-										borderColor: cluster.color,
+										background: filePath.color,
+										borderColor: filePath.color,
 									}}
 								/>{' '}
 								<div data-type="node-label">
-									<span>{cluster.clusterLabel}</span>
+									<span>{filePath.filePathLabel}</span>
 									<div
 										data-type="bar"
 										style={{
 											width:
-												((100 * nodesCount) / maxNodesPerCluster || 0) + '%',
+												((100 * nodesCount) / maxNodesPerFilePath || 0) + '%',
 										}}
 									>
 										<div
