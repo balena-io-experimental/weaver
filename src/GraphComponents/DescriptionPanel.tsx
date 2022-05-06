@@ -2,18 +2,19 @@ import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { FC, useEffect, useState } from 'react';
 import { Panel } from './Panel';
-import ReactMarkdown from 'react-markdown'
+import ReactMarkdown from 'react-markdown';
 import { getRepoReadme } from '../utils/requests';
 
 export const DescriptionPanel: FC = () => {
-
 	const [readmeFile, setReadmeFile] = useState<string>();
 
 	useEffect(() => {
-		getRepoReadme().then(({ data }) => {
-			setReadmeFile(data.data);
-		}).catch(console.error)
-	}, [])
+		getRepoReadme()
+			.then(({ data }) => {
+				setReadmeFile(data.data);
+			})
+			.catch(console.error);
+	}, []);
 
 	if (!readmeFile) {
 		return null;
@@ -27,7 +28,7 @@ export const DescriptionPanel: FC = () => {
 				</>
 			}
 		>
-			 <ReactMarkdown children={readmeFile} />
+			<ReactMarkdown children={readmeFile} />
 		</Panel>
 	);
 };

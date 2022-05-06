@@ -30,6 +30,7 @@ const GlobalStyle = createGlobalStyle`
 	h1 {
 		font-size: 4em;
 		margin: 0;
+	}
 	h1,
 	h2 {
 		font-family: Lato,sans-serif;
