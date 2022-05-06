@@ -46,6 +46,10 @@ app.get("/getRepoInfo", (req: any, res: any) => {
   getRepoInfo(res, req.query.groupBy);
 });
 
+app.get("/getRepoReadme", (req: any, res: any) => {
+  getRepoReadme(res);
+});
+
 app.listen(port, () => {
   console.log(`App listening on port ${port}`);
 });
@@ -165,6 +169,21 @@ const getRepoInfo = async (res: any, groupBy: string) => {
   // TODO: for now we just close the request
   res.status(200).json({ nodes, edges, filePaths });
 };
+
+const getRepoReadme = async (res: any) => {
+  const files = await getFilesInDirectory(REPO_PATH);
+  if(!files) {
+    res.status(404).json({ error: { message: "Repository not cloned yet" } });;
+    return;
+  }
+  const readmePth = files.find(f => f.toLowerCase().includes('readme.md'));
+  if(!readmePth) {
+    res.status(404).json({ error: { message: "Readme file not found in repository" } });;
+    return;
+  }
+  const readmeContent = await promises.readFile(readmePth, "utf8");
+  res.status(200).json({ data: readmeContent });
+}
 
 const getFilesInDirectory = async (dir: string) => {
   if (!checkFileExists(dir)) {
