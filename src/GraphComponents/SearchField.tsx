@@ -17,7 +17,6 @@ const SearchContainer = styled.div`
 		border-radius: var(--border-radius);
 		margin-bottom: 0.5em;
 		padding: 1em 1em 1em 3em;
-		font-family: Lato, sans-serif;
 		font-size: 1em;
 	}
 	svg {

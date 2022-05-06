@@ -24,6 +24,7 @@ import styled from 'styled-components';
 import 'react-sigma-v2/lib/react-sigma-v2.css';
 import { Dataset, FiltersState } from './types';
 import { constant, keyBy, mapValues } from 'lodash';
+import { OnlyOrhpanToggle } from './GraphComponents/OnlyOrphansToggle';
 
 const Wrapper = styled.div`
 	height: calc(100% - 38px);
@@ -99,6 +100,7 @@ export const Graph: FC<GraphProps> = ({
 	const [repositoryName, setRepositoryName] = useState<string>();
 	const [filtersState, setFiltersState] = useState<FiltersState>({
 		filePaths: {},
+		onlyOrphans: false,
 	});
 
 	useEffect(() => {
@@ -111,6 +113,7 @@ export const Graph: FC<GraphProps> = ({
 				getRepoInfo(groupBy).then((res) => {
 					setData(res.data);
 					setFiltersState({
+						...filtersState,
 						filePaths: mapValues(
 							keyBy(res.data.filePaths, 'key'),
 							constant(true),
@@ -178,6 +181,12 @@ export const Graph: FC<GraphProps> = ({
 							/>
 							<Panels>
 								<SearchField filters={filtersState} />
+								<OnlyOrhpanToggle
+									filters={filtersState}
+									toggleOnlyOrphans={(value: boolean) => {
+										setFiltersState({ ...filtersState, onlyOrphans: value });
+									}}
+								/>
 								{/* <DescriptionPanel /> */}
 								<FilePathsPanel
 									filePaths={data.filePaths}
