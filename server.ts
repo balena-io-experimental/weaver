@@ -156,7 +156,7 @@ const getRepoInfo = async (res: any, groupBy: string) => {
             });
           }
           if (
-            !edges.some(([a, b]) => a === relativePath && b === repoFilePath)
+            !edges.some(([a, b]) => a === key && b === repoFilePath)
           ) {
             edges.push([key, repoFilePath]);
           }
