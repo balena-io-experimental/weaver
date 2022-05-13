@@ -4,6 +4,9 @@ import { execSync } from "child_process";
 import express, { json, urlencoded } from "express";
 import { Dataset } from "./src/types";
 
+// starting size of a node before any edges are established
+const DEFAULT_NODE_SIZE = 5;
+
 const REPO_PATH = "./repository";
 let context = {
   repoUrl: "",
@@ -99,8 +102,9 @@ const getRepoInfo = async (res: any, groupBy: string) => {
       key: filePathId,
     });
     try {
+      const sourceIndex = nodes.length;
       nodes.push({
-        key: `${repoFilePath}`,
+        key: repoFilePath,
         label: `/${repoFilePath}`,
         filePath: filePathId,
         URL: `${context.repoUrl.replace(
@@ -109,7 +113,7 @@ const getRepoInfo = async (res: any, groupBy: string) => {
         )}/blob/master/${repoFilePath}`,
         x: Math.random(),
         y: Math.random(),
-        size: 5,
+        size: DEFAULT_NODE_SIZE,
       });
       if (
         !repoFilePath.endsWith("tsx") &&
@@ -137,11 +141,13 @@ const getRepoInfo = async (res: any, groupBy: string) => {
           const key =
             groupBy === "export"
               ? `${comp.name}|${relativePath}`
-              : `${relativePath}`;
-          const idx = nodes.findIndex((node) => node.key === key);
-          if (idx >= 0) {
-            nodes[idx].size = nodes[idx].size + 1;
+              : relativePath;
+          // determine if the import node exists already. If it does increase its size
+          const importIndex = nodes.findIndex((node) => node.key === key);
+          if (importIndex >= 0) {
+            nodes[importIndex].size = nodes[importIndex].size + 1;
           } else {
+            // If the import node does not exist, push it
             nodes.push({
               key,
               label: `import ${comp.name} from ${relativePath}`,
@@ -152,14 +158,14 @@ const getRepoInfo = async (res: any, groupBy: string) => {
               )}/blob/master/${repoFilePath}`,
               x: Math.random(),
               y: Math.random(),
-              size: 5,
+              // all imports have an edge so they start with a size of DEFAULT_NODE_SIZE + 1
+              size: DEFAULT_NODE_SIZE + 1,
             });
-          }
-          if (
-            !edges.some(([a, b]) => a === key && b === repoFilePath)
-          ) {
+            // establish edge between the new import and its source
             edges.push([key, repoFilePath]);
           }
+          // Increase the source node's size by 1
+          nodes[sourceIndex].size = nodes[sourceIndex].size + 1;
         }
       }
     } catch (err) {
@@ -172,18 +178,20 @@ const getRepoInfo = async (res: any, groupBy: string) => {
 
 const getRepoReadme = async (res: any) => {
   const files = await getFilesInDirectory(REPO_PATH);
-  if(!files) {
-    res.status(404).json({ error: { message: "Repository not cloned yet" } });;
+  if (!files) {
+    res.status(404).json({ error: { message: "Repository not cloned yet" } });
     return;
   }
-  const readmePth = files.find(f => f.toLowerCase().includes('readme.md'));
-  if(!readmePth) {
-    res.status(404).json({ error: { message: "Readme file not found in repository" } });;
+  const readmePth = files.find((f) => f.toLowerCase().includes("readme.md"));
+  if (!readmePth) {
+    res
+      .status(404)
+      .json({ error: { message: "Readme file not found in repository" } });
     return;
   }
   const readmeContent = await promises.readFile(readmePth, "utf8");
   res.status(200).json({ data: readmeContent });
-}
+};
 
 const getFilesInDirectory = async (dir: string) => {
   if (!checkFileExists(dir)) {
