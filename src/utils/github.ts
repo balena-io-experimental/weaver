@@ -11,8 +11,19 @@ export const getRepo = (
 		auth: token || process.env.REACT_APP_GITHUB_TOKEN,
 	});
 
-	return octokit.rest.repos.get({
-		owner,
-		repo,
-	});
+	return (
+		octokit.rest.repos
+			.get({
+				owner,
+				repo,
+			})
+			// public repos fail if the provided token is invalid. If the request fails, try again without a token
+			.catch(() =>
+				octokit.rest.repos.get({
+					owner,
+					repo,
+					headers: { authorization: '' },
+				}),
+			)
+	);
 };
