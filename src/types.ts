@@ -6,6 +6,8 @@ export interface NodeData {
 	x: number;
 	y: number;
 	size: number;
+	imports: number;
+	exports: number;
 }
 
 export interface FilePath {
