@@ -42,7 +42,9 @@ export function drawHover(
 	const subLabelSize = size - 2;
 
 	const label = data.label;
-	const filePathLabel = data.filePathLabel;
+	const importsLabel = `Imports: ${data.imports}`;
+	const exportsLabel = `Exports: ${data.exports}`;
+	const filePathLabel = `File path: ${data.filePathLabel}`;
 
 	// Then we draw the label background
 	context.beginPath();
@@ -66,10 +68,18 @@ export function drawHover(
 	const y = Math.round(data.y);
 	const w = Math.round(textWidth + size / 2 + data.size + 3);
 	const hLabel = Math.round(size / 2 + 4);
-
+	const hImports = data.imports ? Math.round(subLabelSize / 2 + 9) : 0;
+	const hExports = data.exports ? Math.round(subLabelSize / 2 + 9) : 0;
 	const hFilePathLabel = Math.round(subLabelSize / 2 + 9);
 
-	drawRoundRect(context, x, y - 12, w, hFilePathLabel + hLabel + 12, 5);
+	drawRoundRect(
+		context,
+		x,
+		y - hImports - hExports - 12,
+		w,
+		hFilePathLabel + hLabel + hImports + hExports + 12,
+		5,
+	);
 	context.closePath();
 	context.fill();
 
@@ -80,15 +90,34 @@ export function drawHover(
 	// And finally we draw the labels
 	context.fillStyle = TEXT_COLOR;
 	context.font = `${weight} ${size}px ${font}`;
-	context.fillText(label, data.x + data.size + 3, data.y + size / 3);
+	context.fillText(label, data.x + data.size + 3, data.y - (4 * size) / 3 - 4);
 
+	
 	context.fillStyle = data.color;
 	context.font = `${weight} ${subLabelSize}px ${font}`;
-	context.fillText(
-		filePathLabel,
+	context.fillText(filePathLabel,
 		data.x + data.size + 3,
-		data.y + size / 3 + 3 + subLabelSize,
+		data.y - (2 * size) / 3 - 2,
 	);
+
+	if (data.imports) {
+		context.fillStyle = TEXT_COLOR;
+		context.font = `${weight} ${subLabelSize}px ${font}`;
+		context.fillText(importsLabel,
+			data.x + data.size + 3,
+			(data.y + size / 3),
+		);
+	}
+
+	if (data.exports) {
+		context.fillStyle = TEXT_COLOR;
+		context.font = `${weight} ${subLabelSize}px ${font}`;
+		context.fillText(exportsLabel,
+			data.x + data.size + 3,
+			data.imports ? data.y + size / 3 + 3 + subLabelSize : 
+			(data.y + size / 3),
+		);
+	}
 }
 
 /**

@@ -114,6 +114,8 @@ const getRepoInfo = async (res: any, groupBy: string) => {
         x: Math.random(),
         y: Math.random(),
         size: DEFAULT_NODE_SIZE,
+        imports: 0,
+        exports: 0,
       });
       if (
         !repoFilePath.endsWith("tsx") &&
@@ -160,6 +162,8 @@ const getRepoInfo = async (res: any, groupBy: string) => {
               y: Math.random(),
               // all imports have an edge so they start with a size of DEFAULT_NODE_SIZE + 1
               size: DEFAULT_NODE_SIZE + 1,
+              imports: 0,
+              exports: 0,
             });
           }
           if (!edges.some(([a, b]) => a === key && b === repoFilePath)) {
@@ -168,6 +172,7 @@ const getRepoInfo = async (res: any, groupBy: string) => {
           }
           // Increase the source node's size by 1
           nodes[sourceIndex].size = nodes[sourceIndex].size + 1;
+          nodes[sourceIndex].imports = nodes[sourceIndex].imports + 1;
         }
       }
     } catch (err) {
