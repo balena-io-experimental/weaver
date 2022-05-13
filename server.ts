@@ -161,7 +161,9 @@ const getRepoInfo = async (res: any, groupBy: string) => {
               // all imports have an edge so they start with a size of DEFAULT_NODE_SIZE + 1
               size: DEFAULT_NODE_SIZE + 1,
             });
-            // establish edge between the new import and its source
+          }
+          if (!edges.some(([a, b]) => a === key && b === repoFilePath)) {
+            // establish edge between the import and its source if it does not exist yet
             edges.push([key, repoFilePath]);
           }
           // Increase the source node's size by 1
